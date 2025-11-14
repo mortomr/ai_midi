@@ -155,13 +155,21 @@ def export_drum_pattern(data, output_path, ticks_per_beat=480):
         note = drum_spec['note']
         drum_name = drum_spec['drum']
 
-        for hit_time in drum_spec['hits']:
+        for hit_data in drum_spec['hits']:
+            # Handle both old format (just time) and new format ((time, velocity) tuple)
+            if isinstance(hit_data, tuple):
+                hit_time, velocity = hit_data
+            else:
+                # Backwards compatibility: old format with just time
+                hit_time = hit_data
+                velocity = 100
+
             # Note on event
             events.append({
                 'time': hit_time,
                 'type': 'note_on',
                 'note': note,
-                'velocity': 100
+                'velocity': velocity
             })
             # Note off event (short duration for drums)
             events.append({

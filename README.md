@@ -121,8 +121,40 @@ The generator uses:
 - **Style Templates**: Different rules for punk vs. singer-songwriter
 - **Controlled Randomization**: Parameters guide variation within musical constraints
 - **Rudiment Integration**: Fills use rudiment-inspired patterns
+- **Humanized Velocity** (NEW!): Realistic velocity variation that sounds human-played
 
 **Every generation is unique** - same parameters create similar but not identical patterns.
+
+### Humanized Velocity Features
+
+The drum generator includes sophisticated velocity humanization for realistic, human-sounding drums:
+
+**Natural Variation**
+- Gaussian distribution for realistic hit-to-hit variation
+- No two hits sound exactly the same
+- Different velocity profiles per style
+
+**Musical Accents**
+- Downbeats naturally emphasized (beat 1 of each bar)
+- Backbeats accented (snare on 2 & 4)
+- Fill crescendos build intensity
+
+**Style-Specific Profiles**
+- **Pop/Punk**: Harder hits (base velocity ~105-110), less variation, consistent energy
+- **Singer-Songwriter**: Softer hits (base velocity ~80-85), more dynamic range, expressive
+
+**Ghost Notes**
+- Subtle low-velocity snare hits for groove
+- Singer-songwriter style includes more dynamics
+
+**Drummer Fatigue**
+- Slight velocity decay over long patterns (8+ bars)
+- Simulates natural human consistency limits
+
+**Fill Crescendos**
+- Tom rolls build in intensity
+- Snare rolls crescendo into crashes
+- Realistic energy curves
 
 ## Installation
 
