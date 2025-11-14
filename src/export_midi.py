@@ -16,7 +16,8 @@ def create_output_dir(base_path="generated"):
         f"{base_path}/chord_progressions",
         f"{base_path}/arpeggios",
         f"{base_path}/scales",
-        f"{base_path}/drum_patterns"
+        f"{base_path}/drum_patterns",
+        f"{base_path}/rudiments"
     ]
     for d in dirs:
         Path(d).mkdir(parents=True, exist_ok=True)
@@ -193,6 +194,76 @@ def export_drum_pattern(data, output_path, ticks_per_beat=480):
     print(f"✓ Exported drum pattern: {output_path}")
 
 
+def export_rudiment(data, output_path, ticks_per_beat=480):
+    """
+    Export rudiment pattern to MIDI file (channel 10)
+
+    Pattern format: [
+        {"hand": "R", "note": 38, "time": 0, "duration": 0.125, "velocity": 90, "grace": false},
+        ...
+    ]
+    """
+    mid = MidiFile(ticks_per_beat=ticks_per_beat)
+    track = MidiTrack()
+    mid.tracks.append(track)
+
+    # Add tempo
+    tempo = bpm2tempo(data['tempo'])
+    track.append(MetaMessage('set_tempo', tempo=tempo, time=0))
+
+    # Add track name
+    track_name = f"{data['name']} - {data['orchestration']} - {data['description']}"
+    track.append(MetaMessage('track_name', name=track_name, time=0))
+
+    # Build list of all events with absolute timing
+    events = []
+    for hit in data['pattern']:
+        note = hit['note']
+        time = hit['time']
+        duration = hit['duration']
+        velocity = hit['velocity']
+        is_grace = hit.get('grace', False)
+
+        # Note on event
+        events.append({
+            'time': time,
+            'type': 'note_on',
+            'note': note,
+            'velocity': velocity,
+            'is_grace': is_grace
+        })
+        # Note off event
+        events.append({
+            'time': time + duration,
+            'type': 'note_off',
+            'note': note,
+            'velocity': 0,
+            'is_grace': is_grace
+        })
+
+    # Sort events by time
+    events.sort(key=lambda x: x['time'])
+
+    # Convert to MIDI messages with delta times
+    current_time = 0
+    for event in events:
+        delta_beats = event['time'] - current_time
+        delta_ticks = beats_to_ticks(delta_beats, ticks_per_beat)
+
+        track.append(Message(
+            event['type'],
+            note=event['note'],
+            velocity=event['velocity'],
+            time=delta_ticks,
+            channel=9  # Channel 10 (0-indexed = 9) is drums
+        ))
+
+        current_time = event['time']
+
+    mid.save(output_path)
+    print(f"✓ Exported rudiment: {output_path}")
+
+
 def sanitize_filename(name):
     """Remove/replace characters that are problematic in filenames"""
     replacements = {
@@ -259,6 +330,18 @@ def export_all_from_json(json_path, output_base="generated"):
             filename = f"{i+1:02d}_{pattern['style']}_{pattern['tempo']}bpm.mid"
             output_path = os.path.join(output_base, "drum_patterns", filename)
             export_drum_pattern(pattern, output_path)
+
+    # Export rudiments
+    if 'rudiment_patterns' in dataset:
+        print(f"\nExporting {len(dataset['rudiment_patterns'])} rudiment patterns...")
+        for i, rudiment in enumerate(dataset['rudiment_patterns']):
+            category = rudiment['category']
+            name = sanitize_filename(rudiment['name'])
+            orchestration = sanitize_filename(rudiment['orchestration'])
+            usage = rudiment['usage']
+            filename = f"{i+1:02d}_{category}_{name}_{orchestration}_{usage}.mid"
+            output_path = os.path.join(output_base, "rudiments", filename)
+            export_rudiment(rudiment, output_path)
 
     print(f"\n{'='*60}")
     print("Export complete!")

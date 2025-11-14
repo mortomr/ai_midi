@@ -33,14 +33,17 @@ This project generates batches of musical patterns and exports them as MIDI file
 ```
 ai_midi/
 ├── data/
-│   └── starter_dataset.json    # Master dataset (80 patterns)
+│   ├── starter_dataset.json    # Master dataset (80 patterns)
+│   └── rudiments_dataset.json  # PAS drum rudiments (32 patterns)
 ├── src/
-│   └── export_midi.py          # Python export script
+│   ├── export_midi.py          # Python export script
+│   └── export_rudiments.py     # Rudiments export script
 ├── generated/                  # Output MIDI files (created on export)
 │   ├── chord_progressions/
 │   ├── arpeggios/
 │   ├── scales/
-│   └── drum_patterns/
+│   ├── drum_patterns/
+│   └── rudiments/
 └── README.md
 ```
 
@@ -50,6 +53,22 @@ ai_midi/
 - **20 Arpeggios**: Fingerpicking patterns and punk arpeggios
 - **20 Scales**: Major, minor, pentatonic, blues, and modal scales
 - **20 Drum Patterns**: From driving punk beats to subtle acoustic grooves
+
+## Drum Rudiments Collection (NEW!)
+
+- **32 PAS International Drum Rudiments**: Professional drum patterns based on the Percussive Arts Society's 40 International Drum Rudiments
+  - **Roll Rudiments**: Single stroke, double stroke, five/six/seven/nine/thirteen/seventeen stroke rolls, triple stroke roll
+  - **Diddle Rudiments**: Single/double/triple paradiddle, paradiddle-diddle
+  - **Flam Rudiments**: Flam, flam accent, flam tap, flamacue, flam paradiddle, Swiss Army triplet, pataflafla
+  - **Drag Rudiments**: Drag (ruff), single/double drag tap, lesson 25, single/double ratamacue
+
+### Rudiment Features:
+- **Multiple Orchestrations**: snare-only, snare+bass, full kit descending, toms, hi-hat+snare, ride patterns
+- **Musical Usage**: fills, accents, rhythms, transitions
+- **Style Adaptations**: Pop/punk (fast, aggressive), singer-songwriter (subtle, dynamic)
+- **Grace Notes**: Authentic flams and drags with proper grace note notation
+- **Dynamic Velocities**: Accent patterns with varied velocities for realism
+- **Hand Sticking**: R/L notation included in metadata for learning
 
 ## Installation
 
@@ -72,14 +91,24 @@ cd ai_midi
 ### Export All Patterns to MIDI
 
 ```bash
+# Export starter dataset (chords, arpeggios, scales, drum patterns)
 python src/export_midi.py
+
+# Export drum rudiments
+python src/export_rudiments.py
 ```
 
-This will:
+**Starter Dataset** export will:
 1. Read `data/starter_dataset.json`
 2. Create the `generated/` directory structure
 3. Export all 80 patterns as individual MIDI files
 4. Organize files by type (chords, arpeggios, scales, drums)
+
+**Rudiments** export will:
+1. Read `data/rudiments_dataset.json`
+2. Export all 32 rudiment patterns as individual MIDI files
+3. Organize by category (roll, diddle, flam, drag) and orchestration
+4. Include proper grace notes for flams and drags
 
 ### Output Example
 
@@ -98,9 +127,15 @@ generated/
 │   ├── 01_C_major.mid
 │   ├── 02_A_minor.mid
 │   └── ...
-└── drum_patterns/
-    ├── 01_pop_punk_160bpm.mid
-    ├── 06_singer_songwriter_85bpm.mid
+├── drum_patterns/
+│   ├── 01_pop_punk_160bpm.mid
+│   ├── 06_singer_songwriter_85bpm.mid
+│   └── ...
+└── rudiments/
+    ├── 01_roll_Single_Stroke_Roll_snare_only_fill.mid
+    ├── 06_diddle_Single_Paradiddle_snare_only_rhythm.mid
+    ├── 10_flam_Flam_snare_only_accent.mid
+    ├── 14_drag_Drag_(Ruff)_snare_only_accent.mid
     └── ...
 ```
 
@@ -174,6 +209,36 @@ The JSON dataset uses a structured format for each pattern type:
 }
 ```
 
+### Rudiment Pattern
+```json
+{
+  "type": "rudiment",
+  "category": "diddle",
+  "name": "Single Paradiddle",
+  "sticking": "RLRR-LRLL",
+  "tempo": 155,
+  "complexity": 2,
+  "style": "pop_punk",
+  "orchestration": "snare_only",
+  "usage": "rhythm",
+  "pattern": [
+    {"hand": "R", "note": 38, "time": 0, "duration": 0.125, "velocity": 95},
+    {"hand": "L", "note": 38, "time": 0.125, "duration": 0.125, "velocity": 85},
+    {"hand": "R", "note": 38, "time": 0.25, "duration": 0.125, "velocity": 95}
+  ],
+  "bars": 0.5,
+  "description": "Classic paradiddle pattern"
+}
+```
+
+**Rudiment fields:**
+- `category`: roll, diddle, flam, drag
+- `sticking`: R/L hand pattern notation
+- `orchestration`: snare_only, full_kit_descending, snare_bass, hihat_snare, etc.
+- `usage`: fill, accent, rhythm, transition
+- `grace`: Set to `true` for grace notes (flams/drags)
+- Each note has precise `time`, `duration`, and `velocity`
+
 ## MIDI Note Reference
 
 ### Drum Mapping (General MIDI)
@@ -203,6 +268,9 @@ Edit `data/starter_dataset.json` and add new entries to the appropriate array:
 - `scales`
 - `drum_patterns`
 
+Or edit `data/rudiments_dataset.json` to add new rudiments to:
+- `rudiment_patterns`
+
 ### Creating Custom Packs
 
 You can create focused packs by:
@@ -229,13 +297,15 @@ Patterns are rated 1-5 for complexity:
 ## Tips for DAW Import
 
 - **Tempo**: Each MIDI file has tempo embedded as metadata
-- **Drum Channel**: Drums are on MIDI channel 10 (standard GM)
+- **Drum Channel**: Drums and rudiments are on MIDI channel 10 (standard GM)
 - **Velocity**:
   - Chords: 100
   - Arpeggios: 90
   - Scales: 85
   - Drums: 100
+  - Rudiments: 60-110 (dynamic, with accents and grace notes)
 - **Format**: Type 1 MIDI files (multi-track)
+- **Grace Notes**: Rudiments with flams/drags have grace notes (very short durations, 0.03 beats)
 
 ## Future Expansions
 
@@ -255,3 +325,4 @@ This project generates musical patterns for creative use. Feel free to use the g
 
 Generated using Python + mido library
 Patterns designed for pop/punk and singer-songwriter styles
+Drum rudiments based on the PAS (Percussive Arts Society) 40 International Drum Rudiments
