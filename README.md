@@ -36,14 +36,20 @@ ai_midi/
 │   ├── starter_dataset.json    # Master dataset (80 patterns)
 │   └── rudiments_dataset.json  # PAS drum rudiments (32 patterns)
 ├── src/
-│   ├── export_midi.py          # Python export script
-│   └── export_rudiments.py     # Rudiments export script
+│   ├── generators/             # Generative engines
+│   │   └── drum_generator.py   # Drum pattern generator
+│   ├── export_midi.py          # MIDI export utilities
+│   ├── export_rudiments.py     # Rudiments export script
+│   └── generate_drums.py       # CLI drum generator
+├── examples/
+│   └── drum_generator_demo.sh  # Demo script
 ├── generated/                  # Output MIDI files (created on export)
 │   ├── chord_progressions/
 │   ├── arpeggios/
 │   ├── scales/
 │   ├── drum_patterns/
-│   └── rudiments/
+│   ├── rudiments/
+│   └── generated_drums/        # Generatively created patterns
 └── README.md
 ```
 
@@ -69,6 +75,54 @@ ai_midi/
 - **Grace Notes**: Authentic flams and drags with proper grace note notation
 - **Dynamic Velocities**: Accent patterns with varied velocities for realism
 - **Hand Sticking**: R/L notation included in metadata for learning
+
+## Generative Drum Engine (NEW!)
+
+**The game changer!** Instead of playing back static patterns, the drum generator creates unique patterns based on musical rules and your parameters.
+
+### How It's Different
+- **Static Datasets**: Translator - plays back pre-written patterns
+- **Generative Engine**: Creator - follows music theory rules to make infinite variations
+
+### Controllable Parameters
+
+Turn these knobs to shape your drum patterns:
+
+- **tempo**: BPM (72-200+)
+- **style**: pop_punk, singer_songwriter, hybrid
+- **bars**: Length (1-64+)
+- **density**: 0.0-1.0 (sparse to busy)
+- **variation**: 0.0-1.0 (repetitive to dynamic)
+- **syncopation**: 0.0-1.0 (straight to off-beat)
+- **fill_frequency**: 0.0-1.0 (how often fills occur)
+- **kick_pattern**: punk, four_floor, half_time, double
+- **hihat_pattern**: eighth, sixteenth, ride, open_closed
+
+### Example Usage
+
+```bash
+# Fast punk beat
+python src/generate_drums.py --tempo 165 --style pop_punk --density 0.8
+
+# Mellow singer-songwriter
+python src/generate_drums.py --tempo 85 --style singer_songwriter --variation 0.3
+
+# Four-on-the-floor with sixteenth hats
+python src/generate_drums.py --kick four_floor --hihat sixteenth --bars 16
+
+# Generate 10 variations of same style
+python src/generate_drums.py --count 10 --style pop_punk --seed 42
+```
+
+### Under the Hood
+
+The generator uses:
+- **Music Theory Rules**: Backbeat always on 2 & 4, fills on phrase endings
+- **Style Templates**: Different rules for punk vs. singer-songwriter
+- **Controlled Randomization**: Parameters guide variation within musical constraints
+- **Rudiment Integration**: Fills use rudiment-inspired patterns
+
+**Every generation is unique** - same parameters create similar but not identical patterns.
 
 ## Installation
 
