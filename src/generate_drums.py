@@ -52,7 +52,7 @@ Parameters Explained:
     # Basic parameters
     parser.add_argument('--tempo', type=int, default=140,
                        help='Tempo in BPM (default: 140)')
-    parser.add_argument('--style', choices=['pop_punk', 'singer_songwriter', 'hybrid'],
+    parser.add_argument('--style', choices=['pop_punk', 'singer_songwriter', 'reggae_ska', 'hybrid'],
                        default='pop_punk',
                        help='Musical style (default: pop_punk)')
     parser.add_argument('--bars', type=int, default=4,
@@ -69,10 +69,10 @@ Parameters Explained:
                        help='Fill probability (0.0-1.0, default: 0.25)')
 
     # Pattern choices
-    parser.add_argument('--kick', choices=['punk', 'four_floor', 'half_time', 'double'],
+    parser.add_argument('--kick', choices=['punk', 'four_floor', 'half_time', 'double', 'skank', 'one_drop', 'd_beat'],
                        default='punk',
                        help='Kick drum pattern (default: punk)')
-    parser.add_argument('--hihat', choices=['eighth', 'sixteenth', 'ride', 'open_closed'],
+    parser.add_argument('--hihat', choices=['eighth', 'sixteenth', 'ride', 'open_closed', 'skank', 'swing'],
                        default='eighth',
                        help='Hi-hat pattern (default: eighth)')
 

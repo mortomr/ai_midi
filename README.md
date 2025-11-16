@@ -28,6 +28,13 @@ This project generates batches of musical patterns and exports them as MIDI file
 - Subtle, acoustic-style drums
 - Keys: Am, Em, Dm, C, G (major and minor)
 
+### Reggae/Ska
+- Offbeat hi-hat patterns (skank)
+- One-drop and skank kick patterns
+- Rimshots and cross-stick snare
+- Laid-back, groove-focused feel
+- Moderate to fast tempos (80-160 BPM)
+
 ## Project Structure
 
 ```
@@ -89,14 +96,14 @@ ai_midi/
 Turn these knobs to shape your drum patterns:
 
 - **tempo**: BPM (72-200+)
-- **style**: pop_punk, singer_songwriter, hybrid
+- **style**: pop_punk, singer_songwriter, reggae_ska, hybrid
 - **bars**: Length (1-64+)
 - **density**: 0.0-1.0 (sparse to busy)
 - **variation**: 0.0-1.0 (repetitive to dynamic)
 - **syncopation**: 0.0-1.0 (straight to off-beat)
 - **fill_frequency**: 0.0-1.0 (how often fills occur)
-- **kick_pattern**: punk, four_floor, half_time, double
-- **hihat_pattern**: eighth, sixteenth, ride, open_closed
+- **kick_pattern**: punk, four_floor, half_time, double, skank, one_drop, d_beat
+- **hihat_pattern**: eighth, sixteenth, ride, open_closed, skank, swing
 
 ### Example Usage
 
@@ -109,6 +116,18 @@ python src/generate_drums.py --tempo 85 --style singer_songwriter --variation 0.
 
 # Four-on-the-floor with sixteenth hats
 python src/generate_drums.py --kick four_floor --hihat sixteenth --bars 16
+
+# Classic ska skank beat
+python src/generate_drums.py --style reggae_ska --kick skank --hihat skank --tempo 140
+
+# Reggae one-drop groove
+python src/generate_drums.py --style reggae_ska --kick one_drop --hihat skank --tempo 90
+
+# Hardcore d-beat
+python src/generate_drums.py --style pop_punk --kick d_beat --hihat sixteenth --tempo 180 --density 1.0
+
+# Swing feel for jazz/blues
+python src/generate_drums.py --hihat swing --tempo 120 --density 0.6
 
 # Generate 10 variations of same style
 python src/generate_drums.py --count 10 --style pop_punk --seed 42
@@ -142,6 +161,7 @@ The drum generator includes sophisticated velocity humanization for realistic, h
 **Style-Specific Profiles**
 - **Pop/Punk**: Harder hits (base velocity ~105-110), less variation, consistent energy
 - **Singer-Songwriter**: Softer hits (base velocity ~80-85), more dynamic range, expressive
+- **Reggae/Ska**: Medium hits (base velocity ~90-95), laid-back feel with rimshots, groove-focused
 
 **Ghost Notes**
 - Subtle low-velocity snare hits for groove
