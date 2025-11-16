@@ -34,23 +34,69 @@ class DrumPatternGenerator:
     # Velocity profiles for different styles
     VELOCITY_PROFILES = {
         'pop_punk': {
-            'kick': {'base': 110, 'variation': 10, 'accent': 15},
-            'snare': {'base': 105, 'variation': 12, 'accent': 15},
-            'hihat': {'base': 75, 'variation': 15, 'accent': 20},
+            'kick': {'base': 108, 'variation': 10, 'accent': 15},
+            'snare': {'base': 103, 'variation': 12, 'accent': 15},
+            'hihat': {'base': 92, 'variation': 15, 'accent': 20},
+            'ride': {'base': 90, 'variation': 12, 'accent': 18},
+            'crash': {'base': 115, 'variation': 8, 'accent': 10},
             'ghost_snare': {'base': 45, 'variation': 10, 'accent': 0},
         },
         'singer_songwriter': {
-            'kick': {'base': 85, 'variation': 20, 'accent': 25},
-            'snare': {'base': 80, 'variation': 25, 'accent': 30},
-            'hihat': {'base': 60, 'variation': 20, 'accent': 25},
+            'kick': {'base': 83, 'variation': 20, 'accent': 25},
+            'snare': {'base': 78, 'variation': 25, 'accent': 30},
+            'hihat': {'base': 78, 'variation': 20, 'accent': 25},
+            'ride': {'base': 80, 'variation': 18, 'accent': 22},
+            'crash': {'base': 95, 'variation': 15, 'accent': 20},
             'ghost_snare': {'base': 35, 'variation': 12, 'accent': 0},
         },
         'reggae_ska': {
-            'kick': {'base': 95, 'variation': 18, 'accent': 20},
-            'snare': {'base': 90, 'variation': 22, 'accent': 25},
+            'kick': {'base': 93, 'variation': 18, 'accent': 20},
+            'snare': {'base': 88, 'variation': 22, 'accent': 25},
             'rim': {'base': 85, 'variation': 20, 'accent': 22},
-            'hihat': {'base': 70, 'variation': 18, 'accent': 28},
+            'hihat': {'base': 88, 'variation': 18, 'accent': 28},
+            'ride': {'base': 85, 'variation': 16, 'accent': 20},
+            'crash': {'base': 100, 'variation': 12, 'accent': 18},
             'ghost_snare': {'base': 40, 'variation': 15, 'accent': 0},
+        },
+        'metal': {
+            'kick': {'base': 115, 'variation': 8, 'accent': 12},
+            'snare': {'base': 110, 'variation': 10, 'accent': 15},
+            'hihat': {'base': 95, 'variation': 12, 'accent': 18},
+            'ride': {'base': 98, 'variation': 10, 'accent': 15},
+            'crash': {'base': 120, 'variation': 5, 'accent': 8},
+            'ghost_snare': {'base': 50, 'variation': 8, 'accent': 0},
+        },
+        'jazz': {
+            'kick': {'base': 70, 'variation': 25, 'accent': 30},
+            'snare': {'base': 65, 'variation': 28, 'accent': 35},
+            'hihat': {'base': 75, 'variation': 22, 'accent': 28},
+            'ride': {'base': 85, 'variation': 18, 'accent': 25},
+            'crash': {'base': 90, 'variation': 20, 'accent': 25},
+            'ghost_snare': {'base': 30, 'variation': 15, 'accent': 0},
+        },
+        'rock': {
+            'kick': {'base': 105, 'variation': 12, 'accent': 18},
+            'snare': {'base': 100, 'variation': 15, 'accent': 20},
+            'hihat': {'base': 88, 'variation': 16, 'accent': 22},
+            'ride': {'base': 92, 'variation': 14, 'accent': 18},
+            'crash': {'base': 110, 'variation': 10, 'accent': 15},
+            'ghost_snare': {'base': 42, 'variation': 12, 'accent': 0},
+        },
+        'indie': {
+            'kick': {'base': 95, 'variation': 18, 'accent': 22},
+            'snare': {'base': 90, 'variation': 20, 'accent': 25},
+            'hihat': {'base': 85, 'variation': 18, 'accent': 24},
+            'ride': {'base': 88, 'variation': 16, 'accent': 20},
+            'crash': {'base': 100, 'variation': 14, 'accent': 18},
+            'ghost_snare': {'base': 38, 'variation': 14, 'accent': 0},
+        },
+        'electronic': {
+            'kick': {'base': 112, 'variation': 5, 'accent': 8},
+            'snare': {'base': 108, 'variation': 6, 'accent': 10},
+            'hihat': {'base': 100, 'variation': 8, 'accent': 12},
+            'ride': {'base': 102, 'variation': 7, 'accent': 10},
+            'crash': {'base': 115, 'variation': 5, 'accent': 8},
+            'ghost_snare': {'base': 48, 'variation': 6, 'accent': 0},
         }
     }
 
@@ -129,7 +175,7 @@ class DrumPatternGenerator:
         Generate a complete drum pattern
 
         Args:
-            style: 'pop_punk', 'singer_songwriter', 'reggae_ska', 'hybrid'
+            style: 'pop_punk', 'singer_songwriter', 'reggae_ska', 'metal', 'jazz', 'rock', 'indie', 'electronic', 'hybrid'
             bars: Number of bars (4/4 time)
             density: 0.0-1.0, how busy the pattern is
             variation: 0.0-1.0, how much the pattern changes

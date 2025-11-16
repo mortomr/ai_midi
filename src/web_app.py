@@ -102,7 +102,7 @@ def download_file(filename):
 def get_info():
     """Get available options for dropdowns"""
     return jsonify({
-        'styles': ['pop_punk', 'singer_songwriter', 'reggae_ska', 'hybrid'],
+        'styles': ['pop_punk', 'singer_songwriter', 'reggae_ska', 'metal', 'jazz', 'rock', 'indie', 'electronic', 'hybrid'],
         'sections': ['none', 'intro', 'verse', 'pre_chorus', 'chorus', 'bridge', 'breakdown', 'outro'],
         'kick_patterns': ['punk', 'four_floor', 'half_time', 'double', 'skank', 'one_drop', 'd_beat'],
         'hihat_patterns': ['eighth', 'sixteenth', 'ride', 'open_closed', 'skank', 'swing']

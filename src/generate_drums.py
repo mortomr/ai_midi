@@ -52,7 +52,7 @@ Parameters Explained:
     # Basic parameters
     parser.add_argument('--tempo', type=int, default=140,
                        help='Tempo in BPM (default: 140)')
-    parser.add_argument('--style', choices=['pop_punk', 'singer_songwriter', 'reggae_ska', 'hybrid'],
+    parser.add_argument('--style', choices=['pop_punk', 'singer_songwriter', 'reggae_ska', 'metal', 'jazz', 'rock', 'indie', 'electronic', 'hybrid'],
                        default='pop_punk',
                        help='Musical style (default: pop_punk)')
     parser.add_argument('--bars', type=int, default=4,
