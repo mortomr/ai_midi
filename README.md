@@ -97,6 +97,7 @@ Turn these knobs to shape your drum patterns:
 
 - **tempo**: BPM (72-200+)
 - **style**: pop_punk, singer_songwriter, reggae_ska, hybrid
+- **section**: Song section - auto-adjusts intensity (intro, verse, pre_chorus, chorus, bridge, breakdown, outro)
 - **bars**: Length (1-64+)
 - **density**: 0.0-1.0 (sparse to busy)
 - **variation**: 0.0-1.0 (repetitive to dynamic)
@@ -129,18 +130,40 @@ python src/generate_drums.py --style pop_punk --kick d_beat --hihat sixteenth --
 # Swing feel for jazz/blues
 python src/generate_drums.py --hihat swing --tempo 120 --density 0.6
 
+# Song section examples (auto-adjusts intensity)
+python src/generate_drums.py --section verse --style pop_punk --bars 8
+python src/generate_drums.py --section chorus --style pop_punk --bars 8
+python src/generate_drums.py --section breakdown --style pop_punk --bars 4
+python src/generate_drums.py --section bridge --style singer_songwriter --bars 8
+
 # Generate 10 variations of same style
 python src/generate_drums.py --count 10 --style pop_punk --seed 42
 ```
+
+### Song Section Intelligence (NEW!)
+
+The generator can automatically adjust intensity based on song structure! Use `--section` to get musically appropriate patterns:
+
+**Section Types:**
+- **intro**: Building, sparse groove (lower density, moderate fills)
+- **verse**: Groove-focused, supportive (medium-low density, fewer fills)
+- **pre_chorus**: Building tension (higher density, more fills)
+- **chorus**: Full energy, driving (highest density, powerful)
+- **bridge**: Contrasting, transitional (high variation for dynamic change)
+- **breakdown**: Minimal, stripped down (very sparse, almost no fills)
+- **outro**: Ending with impact (moderate density, big fills)
+
+Each section type automatically modifies your density, variation, and fill parameters for musical appropriateness. You can still override by specifying parameters explicitly.
 
 ### Under the Hood
 
 The generator uses:
 - **Music Theory Rules**: Backbeat always on 2 & 4, fills on phrase endings
-- **Style Templates**: Different rules for punk vs. singer-songwriter
+- **Style Templates**: Different rules for punk vs. singer-songwriter vs. reggae/ska
+- **Song Section Intelligence** (NEW!): Auto-adjusts intensity for intro, verse, chorus, bridge, etc.
 - **Controlled Randomization**: Parameters guide variation within musical constraints
 - **Rudiment Integration**: Fills use rudiment-inspired patterns
-- **Humanized Velocity** (NEW!): Realistic velocity variation that sounds human-played
+- **Humanized Velocity**: Realistic velocity variation that sounds human-played
 
 **Every generation is unique** - same parameters create similar but not identical patterns.
 

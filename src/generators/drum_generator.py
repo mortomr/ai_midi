@@ -54,6 +54,53 @@ class DrumPatternGenerator:
         }
     }
 
+    # Song section intensity profiles
+    # Modifies density, variation, and fill_frequency based on musical context
+    SECTION_PROFILES = {
+        'intro': {
+            'density_mult': 0.6,      # Sparse, building
+            'variation_mult': 0.7,     # Somewhat repetitive
+            'fill_mult': 0.8,          # Moderate fills to build tension
+            'description': 'Building, sparse groove'
+        },
+        'verse': {
+            'density_mult': 0.75,      # Supportive groove
+            'variation_mult': 0.6,     # Consistent, not distracting
+            'fill_mult': 0.5,          # Fewer fills, stay supportive
+            'description': 'Groove-focused, supportive'
+        },
+        'pre_chorus': {
+            'density_mult': 0.9,       # Building energy
+            'variation_mult': 0.8,     # Some variation to signal change
+            'fill_mult': 1.2,          # More fills to build
+            'description': 'Building tension and energy'
+        },
+        'chorus': {
+            'density_mult': 1.1,       # Full energy, driving
+            'variation_mult': 0.7,     # Powerful but consistent
+            'fill_mult': 0.9,          # Fills present but not overdone
+            'description': 'Full energy, powerful and driving'
+        },
+        'bridge': {
+            'density_mult': 0.85,      # Different feel
+            'variation_mult': 1.3,     # High variation for contrast
+            'fill_mult': 1.0,          # Transitional fills
+            'description': 'Contrasting, transitional'
+        },
+        'breakdown': {
+            'density_mult': 0.3,       # Stripped down
+            'variation_mult': 0.4,     # Minimal, focused
+            'fill_mult': 0.2,          # Very few fills
+            'description': 'Minimal, stripped down'
+        },
+        'outro': {
+            'density_mult': 0.7,       # Winding down or powerful ending
+            'variation_mult': 0.9,     # Some variation
+            'fill_mult': 1.5,          # Bigger fills for finale
+            'description': 'Ending with impact or fade'
+        }
+    }
+
     def __init__(self, tempo=140, seed=None, humanize=True):
         """
         Initialize the drum generator
@@ -76,7 +123,8 @@ class DrumPatternGenerator:
                         syncopation=0.3,
                         fill_frequency=0.25,
                         kick_pattern='punk',
-                        hihat_pattern='eighth'):
+                        hihat_pattern='eighth',
+                        section=None):
         """
         Generate a complete drum pattern
 
@@ -89,10 +137,18 @@ class DrumPatternGenerator:
             fill_frequency: 0.0-1.0, probability of fills
             kick_pattern: 'punk', 'four_floor', 'half_time', 'double', 'skank', 'one_drop', 'd_beat'
             hihat_pattern: 'eighth', 'sixteenth', 'ride', 'open_closed', 'skank', 'swing'
+            section: Song section (optional): 'intro', 'verse', 'pre_chorus', 'chorus', 'bridge', 'breakdown', 'outro'
 
         Returns:
             Dictionary with pattern data ready for MIDI export
         """
+
+        # Apply section-based intensity modifiers if section is specified
+        if section and section in self.SECTION_PROFILES:
+            profile = self.SECTION_PROFILES[section]
+            density = min(1.0, density * profile['density_mult'])
+            variation = min(1.0, variation * profile['variation_mult'])
+            fill_frequency = min(1.0, fill_frequency * profile['fill_mult'])
 
         # Store hits with timing and velocity: {drum: [(time, velocity), ...]}
         pattern_hits = {drum: [] for drum in self.DRUMS.keys()}
@@ -129,6 +185,12 @@ class DrumPatternGenerator:
                     'hits': hits  # Now contains (time, velocity) tuples
                 })
 
+        # Build description
+        description = f"Generated {style} pattern - {bars} bars"
+        if section:
+            section_desc = self.SECTION_PROFILES.get(section, {}).get('description', section)
+            description = f"{section.replace('_', '-').title()} - {section_desc}"
+
         return {
             'type': 'drum_pattern',
             'tempo': self.tempo,
@@ -136,8 +198,9 @@ class DrumPatternGenerator:
             'style': style,
             'pattern': pattern_data,
             'bars': bars,
+            'section': section,
             'humanized': self.humanize,
-            'description': f"Generated {style} pattern - {bars} bars"
+            'description': description
         }
 
     def _get_velocity(self, drum_type, time_position, is_accent=False, is_ghost=False, fill_progress=0.0):

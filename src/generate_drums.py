@@ -76,6 +76,10 @@ Parameters Explained:
                        default='eighth',
                        help='Hi-hat pattern (default: eighth)')
 
+    # Song section (intensity control)
+    parser.add_argument('--section', choices=['intro', 'verse', 'pre_chorus', 'chorus', 'bridge', 'breakdown', 'outro'],
+                       help='Song section - auto-adjusts intensity (optional)')
+
     # Output options
     parser.add_argument('--output', '-o', type=str,
                        help='Output filename (default: auto-generated)')
@@ -104,6 +108,8 @@ Parameters Explained:
     print("Drum Pattern Generator")
     print(f"{'='*60}\n")
     print(f"Style: {args.style}")
+    if args.section:
+        print(f"Section: {args.section.replace('_', '-').title()}")
     print(f"Tempo: {args.tempo} BPM")
     print(f"Bars: {args.bars}")
     print(f"Kick: {args.kick}, Hi-hat: {args.hihat}")
@@ -125,14 +131,18 @@ Parameters Explained:
             syncopation=args.syncopation,
             fill_frequency=args.fill_frequency,
             kick_pattern=args.kick,
-            hihat_pattern=args.hihat
+            hihat_pattern=args.hihat,
+            section=args.section
         )
 
         # Generate filename
         if args.output and args.count == 1:
             filename = args.output
         else:
-            params_str = f"{args.style}_{args.tempo}bpm_d{int(args.density*10)}v{int(args.variation*10)}s{int(args.syncopation*10)}"
+            params_str = f"{args.style}_{args.tempo}bpm"
+            if args.section:
+                params_str += f"_{args.section}"
+            params_str += f"_d{int(args.density*10)}v{int(args.variation*10)}s{int(args.syncopation*10)}"
             if args.count > 1:
                 params_str += f"_var{i+1:02d}"
             filename = f"{sanitize_filename(params_str)}.mid"
