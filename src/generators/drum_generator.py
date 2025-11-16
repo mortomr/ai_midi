@@ -458,6 +458,84 @@ class DrumPatternGenerator:
                 velocity = self._get_velocity('kick', time)
                 self._add_drum_hit(pattern_hits, 'kick', time, velocity)
 
+        elif kick_pattern == 'gallop':
+            # Galloping kick pattern - triplet feel (Bad Religion, NOFX style)
+            # Main kicks on 1 and 3
+            time = offset + 0
+            velocity = self._get_velocity('kick', time, is_accent=True)
+            self._add_drum_hit(pattern_hits, 'kick', time, velocity)
+
+            time = offset + 2
+            velocity = self._get_velocity('kick', time, is_accent=True)
+            self._add_drum_hit(pattern_hits, 'kick', time, velocity)
+
+            # Add gallop kicks (quick doubles/triplets)
+            if random.random() < 0.7:
+                # Gallop before beat 2
+                time = offset + 1.75
+                velocity = self._get_velocity('kick', time)
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
+
+            if random.random() < variation * 0.8:
+                # Gallop before beat 4
+                time = offset + 3.75
+                velocity = self._get_velocity('kick', time)
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
+
+            # Occasional triplet gallop
+            if random.random() < syncopation:
+                time = offset + 0.667  # First triplet after beat 1
+                velocity = self._get_velocity('kick', time)
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
+
+        elif kick_pattern == 'fast_double':
+            # Fast skate punk doubles (NOFX, Bad Religion high-speed)
+            # Rapid kick doubles on main beats
+            for beat in [0, 2]:
+                time = offset + beat
+                velocity = self._get_velocity('kick', time, is_accent=True)
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
+
+                # Quick double
+                time = offset + beat + 0.25
+                velocity = self._get_velocity('kick', time)
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
+
+            # Syncopated kicks
+            if random.random() < syncopation * 0.8:
+                time = offset + 1.5
+                velocity = self._get_velocity('kick', time)
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
+                # And maybe a double on that too
+                if random.random() < 0.6:
+                    time = offset + 1.75
+                    velocity = self._get_velocity('kick', time)
+                    self._add_drum_hit(pattern_hits, 'kick', time, velocity)
+
+            if random.random() < syncopation * 0.6:
+                time = offset + 3.5
+                velocity = self._get_velocity('kick', time)
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
+
+        elif kick_pattern == 'sparse':
+            # Sparse, space-conscious pattern (Fugazi, post-hardcore)
+            # Minimal kicks, leaving space
+            time = offset + 0
+            velocity = self._get_velocity('kick', time, is_accent=True)
+            self._add_drum_hit(pattern_hits, 'kick', time, velocity)
+
+            # Sometimes kick on 3, sometimes leave it empty
+            if random.random() < variation * 0.7:
+                time = offset + 2
+                velocity = self._get_velocity('kick', time)
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
+
+            # Sparse syncopation - very occasional
+            if random.random() < syncopation * 0.3:
+                time = offset + random.choice([1.5, 2.5, 3.5])
+                velocity = self._get_velocity('kick', time)
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
+
     def _add_snare(self, pattern_hits, offset, style, variation, syncopation, bar_num):
         """Add snare hits - always on backbeat plus variations with humanized velocity"""
 
@@ -602,6 +680,101 @@ class DrumPatternGenerator:
                     else:
                         velocity = self._get_velocity('hihat_closed', time)
                         pattern_hits['hihat_closed'].append((time, velocity))
+
+        elif hihat_pattern == 'skate_punk':
+            # Fast skate punk 16ths with attitude (NOFX, Bad Religion)
+            # Relentless 16th notes, very tight
+            for sixteenth in range(16):
+                time = offset + sixteenth * 0.25
+                # Always play - this is relentless!
+                is_accent = (sixteenth % 4 == 0)  # Accent on quarter notes
+                velocity = self._get_velocity('hihat_closed', time, is_accent=is_accent)
+                pattern_hits['hihat_closed'].append((time, velocity))
+
+                # Occasional open hat on upbeats for accent
+                if (sixteenth % 4 == 2) and random.random() < variation * 0.15:
+                    # Replace closed with open
+                    pattern_hits['hihat_closed'].pop()
+                    velocity = self._get_velocity('hihat_open', time, is_accent=True)
+                    pattern_hits['hihat_open'].append((time, velocity))
+
+        elif hihat_pattern == 'travis_barker':
+            # Travis Barker style - creative open/closed work
+            # Signature Blink-182 feel with lots of opens
+            for eighth in range(8):
+                time = offset + eighth * 0.5
+                is_downbeat = (eighth % 2 == 0)
+
+                if is_downbeat:
+                    # Downbeats mostly closed
+                    velocity = self._get_velocity('hihat_closed', time, is_accent=True)
+                    pattern_hits['hihat_closed'].append((time, velocity))
+                else:
+                    # Upbeats frequently open for that signature sound
+                    if random.random() < 0.7:
+                        velocity = self._get_velocity('hihat_open', time)
+                        pattern_hits['hihat_open'].append((time, velocity))
+                    else:
+                        velocity = self._get_velocity('hihat_closed', time)
+                        pattern_hits['hihat_closed'].append((time, velocity))
+
+                # Add some extra 16th note embellishments
+                if random.random() < variation * 0.4:
+                    time = offset + eighth * 0.5 + 0.25
+                    velocity = self._get_velocity('hihat_closed', time)
+                    pattern_hits['hihat_closed'].append((time, velocity))
+
+        elif hihat_pattern == 'sparse':
+            # Sparse, minimal pattern (Fugazi style)
+            # Less is more - focusing on space
+            for beat in range(4):
+                time = offset + beat
+                # Only play on some beats
+                if random.random() < density * 0.6:
+                    velocity = self._get_velocity('hihat_closed', time, is_accent=(beat % 2 == 0))
+                    pattern_hits['hihat_closed'].append((time, velocity))
+
+                # Very occasional upbeat
+                if random.random() < variation * 0.3:
+                    time = offset + beat + 0.5
+                    # Sometimes open for accent
+                    if random.random() < 0.5:
+                        velocity = self._get_velocity('hihat_open', time)
+                        pattern_hits['hihat_open'].append((time, velocity))
+                    else:
+                        velocity = self._get_velocity('hihat_closed', time)
+                        pattern_hits['hihat_closed'].append((time, velocity))
+
+        elif hihat_pattern == 'complex':
+            # Complex, technical pattern (NoMeansNo style)
+            # Jazz-influenced with varied subdivisions
+            # Mix of quarters, eighths, and 16ths in creative ways
+            for beat in range(4):
+                # Downbeat (quarter note)
+                time = offset + beat
+                velocity = self._get_velocity('hihat_closed', time, is_accent=True)
+                pattern_hits['hihat_closed'].append((time, velocity))
+
+                # Complex subdivisions - sometimes triplets, sometimes 16ths
+                if random.random() < density * 0.7:
+                    if random.random() < 0.5:
+                        # Triplet feel
+                        time = offset + beat + 0.333
+                        velocity = self._get_velocity('hihat_closed', time)
+                        pattern_hits['hihat_closed'].append((time, velocity))
+                        if random.random() < 0.6:
+                            time = offset + beat + 0.667
+                            velocity = self._get_velocity('hihat_closed', time)
+                            pattern_hits['hihat_closed'].append((time, velocity))
+                    else:
+                        # 16th note subdivision
+                        time = offset + beat + 0.25
+                        velocity = self._get_velocity('hihat_closed', time)
+                        pattern_hits['hihat_closed'].append((time, velocity))
+                        if random.random() < variation * 0.7:
+                            time = offset + beat + 0.75
+                            velocity = self._get_velocity('hihat_closed', time)
+                            pattern_hits['hihat_closed'].append((time, velocity))
 
     def _add_fill(self, pattern_hits, offset, style, density, bar_num, total_bars, rudiment_type='mixed', rudiment_intensity=0.5):
         """

@@ -157,6 +157,66 @@ const presets = {
         fill_frequency: 0.2,
         kick_pattern: 'half_time',
         hihat_pattern: 'eighth'
+    },
+    'bad-religion': {
+        tempo: 180,
+        style: 'pop_punk',
+        section: 'chorus',
+        bars: 8,
+        density: 0.9,
+        variation: 0.5,
+        syncopation: 0.5,
+        fill_frequency: 0.25,
+        kick_pattern: 'gallop',
+        hihat_pattern: 'skate_punk'
+    },
+    'nofx': {
+        tempo: 195,
+        style: 'pop_punk',
+        section: 'chorus',
+        bars: 8,
+        density: 1.0,
+        variation: 0.7,
+        syncopation: 0.6,
+        fill_frequency: 0.35,
+        kick_pattern: 'fast_double',
+        hihat_pattern: 'skate_punk'
+    },
+    'blink182': {
+        tempo: 170,
+        style: 'pop_punk',
+        section: 'verse',
+        bars: 8,
+        density: 0.85,
+        variation: 0.7,
+        syncopation: 0.5,
+        fill_frequency: 0.3,
+        kick_pattern: 'punk',
+        hihat_pattern: 'travis_barker'
+    },
+    'fugazi': {
+        tempo: 130,
+        style: 'indie',
+        section: 'verse',
+        bars: 8,
+        density: 0.5,
+        variation: 0.8,
+        syncopation: 0.6,
+        fill_frequency: 0.2,
+        kick_pattern: 'sparse',
+        hihat_pattern: 'sparse'
+    },
+    'nomeansno': {
+        tempo: 155,
+        style: 'jazz',
+        section: 'verse',
+        bars: 8,
+        density: 0.8,
+        variation: 0.9,
+        syncopation: 0.7,
+        fill_frequency: 0.4,
+        kick_pattern: 'punk',
+        hihat_pattern: 'complex'
     }
 };
 
