@@ -164,6 +164,32 @@ select:focus {
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
+input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    background: var(--surface-hover);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+input[type="number"]:hover {
+    border-color: var(--primary-color);
+}
+
+input[type="number"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+input[type="number"]::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
 .help-text {
     margin-top: 6px;
     font-size: 0.85rem;

@@ -189,6 +189,7 @@ const patternDescription = document.getElementById('pattern-description');
 
 generateBtn.addEventListener('click', async () => {
     // Gather all parameters
+    const seedValue = document.getElementById('seed').value;
     const params = {
         tempo: document.getElementById('tempo').value,
         style: document.getElementById('style').value,
@@ -201,6 +202,11 @@ generateBtn.addEventListener('click', async () => {
         kick_pattern: document.getElementById('kick_pattern').value,
         hihat_pattern: document.getElementById('hihat_pattern').value
     };
+
+    // Add seed if provided (optional)
+    if (seedValue !== '') {
+        params.seed = parseInt(seedValue);
+    }
 
     // Update UI
     generateBtn.disabled = true;

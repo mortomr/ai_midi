@@ -46,9 +46,10 @@ def generate_pattern():
         fill_frequency = float(data.get('fill_frequency', 0.25))
         kick_pattern = data.get('kick_pattern', 'punk')
         hihat_pattern = data.get('hihat_pattern', 'eighth')
+        seed = data.get('seed')  # Optional - None if not provided
 
         # Generate pattern
-        generator = DrumPatternGenerator(tempo=tempo)
+        generator = DrumPatternGenerator(tempo=tempo, seed=seed)
         pattern = generator.generate_pattern(
             style=style,
             bars=bars,
