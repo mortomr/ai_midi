@@ -16,8 +16,10 @@ app = Flask(__name__,
             template_folder='../templates',
             static_folder='../static')
 
-# Store generated files temporarily
-TEMP_DIR = Path('generated/web_temp')
+# Store generated files temporarily - use absolute path
+# Get the project root directory (parent of src)
+PROJECT_ROOT = Path(__file__).parent.parent
+TEMP_DIR = PROJECT_ROOT / 'generated' / 'web_temp'
 TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
 
