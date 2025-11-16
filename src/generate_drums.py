@@ -80,6 +80,10 @@ Parameters Explained:
     parser.add_argument('--section', choices=['intro', 'verse', 'pre_chorus', 'chorus', 'bridge', 'breakdown', 'outro'],
                        help='Song section - auto-adjusts intensity (optional)')
 
+    # Special modes
+    parser.add_argument('--fills-only', action='store_true',
+                       help='Generate only fills, no groove (perfect for 1-bar fill library)')
+
     # Output options
     parser.add_argument('--output', '-o', type=str,
                        help='Output filename (default: auto-generated)')
@@ -132,7 +136,8 @@ Parameters Explained:
             fill_frequency=args.fill_frequency,
             kick_pattern=args.kick,
             hihat_pattern=args.hihat,
-            section=args.section
+            section=args.section,
+            fills_only=args.fills_only
         )
 
         # Generate filename
@@ -140,6 +145,8 @@ Parameters Explained:
             filename = args.output
         else:
             params_str = f"{args.style}_{args.tempo}bpm"
+            if args.fills_only:
+                params_str += "_FILL"
             if args.section:
                 params_str += f"_{args.section}"
             params_str += f"_d{int(args.density*10)}v{int(args.variation*10)}s{int(args.syncopation*10)}"

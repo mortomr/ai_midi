@@ -190,7 +190,8 @@ class DrumPatternGenerator:
                         fill_frequency=0.25,
                         kick_pattern='punk',
                         hihat_pattern='eighth',
-                        section=None):
+                        section=None,
+                        fills_only=False):
         """
         Generate a complete drum pattern
 
@@ -204,6 +205,7 @@ class DrumPatternGenerator:
             kick_pattern: 'punk', 'four_floor', 'half_time', 'double', 'skank', 'one_drop', 'd_beat'
             hihat_pattern: 'eighth', 'sixteenth', 'ride', 'open_closed', 'skank', 'swing'
             section: Song section (optional): 'intro', 'verse', 'pre_chorus', 'chorus', 'bridge', 'breakdown', 'outro'
+            fills_only: Generate only fills, no groove (default: False)
 
         Returns:
             Dictionary with pattern data ready for MIDI export
@@ -224,22 +226,28 @@ class DrumPatternGenerator:
 
         # Generate each bar
         for bar_num in range(bars):
-            is_fill_bar = random.random() < fill_frequency
             bar_offset = bar_num * 4
 
-            if is_fill_bar and bar_num == bars - 1:
-                # Last bar fill
+            if fills_only:
+                # Fills-only mode: generate fill for every bar
                 self._add_fill(pattern_hits, bar_offset, style, density, bar_num, bars)
             else:
-                # Regular groove
-                self._add_kick(pattern_hits, bar_offset, kick_pattern, variation, syncopation, bar_num)
-                self._add_snare(pattern_hits, bar_offset, style, variation, syncopation, bar_num)
-                self._add_hihats(pattern_hits, bar_offset, hihat_pattern, density, variation, bar_num)
+                # Normal mode: groove with occasional fills
+                is_fill_bar = random.random() < fill_frequency
 
-                # Add occasional cymbals
-                if bar_num % 4 == 0 and bar_num > 0:
-                    velocity = self._get_velocity('crash', bar_offset, is_accent=True)
-                    pattern_hits['crash'].append((bar_offset, velocity))
+                if is_fill_bar and bar_num == bars - 1:
+                    # Last bar fill
+                    self._add_fill(pattern_hits, bar_offset, style, density, bar_num, bars)
+                else:
+                    # Regular groove
+                    self._add_kick(pattern_hits, bar_offset, kick_pattern, variation, syncopation, bar_num)
+                    self._add_snare(pattern_hits, bar_offset, style, variation, syncopation, bar_num)
+                    self._add_hihats(pattern_hits, bar_offset, hihat_pattern, density, variation, bar_num)
+
+                    # Add occasional cymbals
+                    if bar_num % 4 == 0 and bar_num > 0:
+                        velocity = self._get_velocity('crash', bar_offset, is_accent=True)
+                        pattern_hits['crash'].append((bar_offset, velocity))
 
         # Convert to the format expected by export functions with velocity
         pattern_data = []

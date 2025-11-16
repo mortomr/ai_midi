@@ -200,7 +200,8 @@ generateBtn.addEventListener('click', async () => {
         syncopation: document.getElementById('syncopation').value,
         fill_frequency: document.getElementById('fill_frequency').value,
         kick_pattern: document.getElementById('kick_pattern').value,
-        hihat_pattern: document.getElementById('hihat_pattern').value
+        hihat_pattern: document.getElementById('hihat_pattern').value,
+        fills_only: document.getElementById('fills_only').checked
     };
 
     // Add seed if provided (optional)
