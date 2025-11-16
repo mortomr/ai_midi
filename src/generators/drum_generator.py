@@ -17,8 +17,10 @@ class DrumPatternGenerator:
 
     # General MIDI drum map
     DRUMS = {
-        'kick': 36,
-        'snare': 38,
+        'kick': 36,          # C2 - Primary kick (Bass Drum 1)
+        'kick_alt': 35,      # B1 - Alternate kick (Acoustic Bass Drum)
+        'snare': 38,         # D2 - Primary snare (Acoustic Snare)
+        'snare_alt': 40,     # E2 - Alternate snare (Electric Snare)
         'rim': 37,
         'hihat_closed': 42,
         'hihat_open': 46,
@@ -160,6 +162,24 @@ class DrumPatternGenerator:
         self.humanize = humanize
         if seed is not None:
             random.seed(seed)
+
+    def _add_drum_hit(self, pattern_hits, drum_type, time, velocity):
+        """
+        Add drum hit with random sample variation for kick/snare
+
+        30% chance to use alternate sample for more natural/varied sound
+        """
+        if drum_type == 'kick':
+            # 30% chance to use alternate kick sample
+            key = 'kick_alt' if random.random() < 0.3 else 'kick'
+            pattern_hits[key].append((time, velocity))
+        elif drum_type == 'snare':
+            # 30% chance to use alternate snare sample
+            key = 'snare_alt' if random.random() < 0.3 else 'snare'
+            pattern_hits[key].append((time, velocity))
+        else:
+            # All other drums use single sample
+            pattern_hits[drum_type].append((time, velocity))
 
     def generate_pattern(self,
                         style='pop_punk',
@@ -328,103 +348,103 @@ class DrumPatternGenerator:
             # Classic punk: 1 and 3, sometimes with syncopation
             time = offset + 0
             velocity = self._get_velocity('kick', time, is_accent=(bar_num % 4 == 0))
-            pattern_hits['kick'].append((time, velocity))
+            self._add_drum_hit(pattern_hits, 'kick', time, velocity)
 
             time = offset + 2
             velocity = self._get_velocity('kick', time)
-            pattern_hits['kick'].append((time, velocity))
+            self._add_drum_hit(pattern_hits, 'kick', time, velocity)
 
             # Add syncopated kicks
             if random.random() < syncopation:
                 time = offset + 1.5
                 velocity = self._get_velocity('kick', time)
-                pattern_hits['kick'].append((time, velocity))
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
             if random.random() < syncopation * 0.5:
                 time = offset + 3.5
                 velocity = self._get_velocity('kick', time)
-                pattern_hits['kick'].append((time, velocity))
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
 
         elif kick_pattern == 'four_floor':
             # Four on the floor
             for beat in range(4):
                 time = offset + beat
                 velocity = self._get_velocity('kick', time, is_accent=(beat == 0))
-                pattern_hits['kick'].append((time, velocity))
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
 
         elif kick_pattern == 'half_time':
             # Half-time feel
             time = offset + 0
             velocity = self._get_velocity('kick', time, is_accent=True)
-            pattern_hits['kick'].append((time, velocity))
+            self._add_drum_hit(pattern_hits, 'kick', time, velocity)
 
             if random.random() < variation:
                 time = offset + 2.5
             else:
                 time = offset + 3
             velocity = self._get_velocity('kick', time)
-            pattern_hits['kick'].append((time, velocity))
+            self._add_drum_hit(pattern_hits, 'kick', time, velocity)
 
         elif kick_pattern == 'double':
             # Double bass punk
             for beat in [0, 0.5, 2, 2.5]:
                 time = offset + beat
                 velocity = self._get_velocity('kick', time, is_accent=(beat == 0))
-                pattern_hits['kick'].append((time, velocity))
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
                 if random.random() < variation * 0.3:
                     time = offset + beat + 0.25
                     velocity = self._get_velocity('kick', time)
-                    pattern_hits['kick'].append((time, velocity))
+                    self._add_drum_hit(pattern_hits, 'kick', time, velocity)
 
         elif kick_pattern == 'skank':
             # Ska/reggae skank: emphasis on 1, groove feel
             time = offset + 0
             velocity = self._get_velocity('kick', time, is_accent=True)
-            pattern_hits['kick'].append((time, velocity))
+            self._add_drum_hit(pattern_hits, 'kick', time, velocity)
 
             # Sometimes add kick on 3 for variation
             if random.random() < variation * 0.6:
                 time = offset + 2
                 velocity = self._get_velocity('kick', time)
-                pattern_hits['kick'].append((time, velocity))
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
 
             # Subtle kick on 2.5 or 3.5 for groove
             if random.random() < syncopation * 0.7:
                 time = offset + random.choice([2.5, 3.5])
                 velocity = self._get_velocity('kick', time)
-                pattern_hits['kick'].append((time, velocity))
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
 
         elif kick_pattern == 'one_drop':
             # Reggae one-drop: NO kick on 1, heavy on 3
             time = offset + 2
             velocity = self._get_velocity('kick', time, is_accent=True)
-            pattern_hits['kick'].append((time, velocity))
+            self._add_drum_hit(pattern_hits, 'kick', time, velocity)
 
             # Sometimes subtle kick on 3.5 for variation
             if random.random() < variation * 0.5:
                 time = offset + 3.5
                 velocity = self._get_velocity('kick', time)
-                pattern_hits['kick'].append((time, velocity))
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
 
         elif kick_pattern == 'd_beat':
             # Hardcore d-beat: doubles the snare pattern
             # Kick on 1 and 3
             time = offset + 0
             velocity = self._get_velocity('kick', time, is_accent=True)
-            pattern_hits['kick'].append((time, velocity))
+            self._add_drum_hit(pattern_hits, 'kick', time, velocity)
 
             time = offset + 2
             velocity = self._get_velocity('kick', time, is_accent=True)
-            pattern_hits['kick'].append((time, velocity))
+            self._add_drum_hit(pattern_hits, 'kick', time, velocity)
 
             # Additional syncopated kicks for intensity
             if random.random() < syncopation:
                 time = offset + 1.5
                 velocity = self._get_velocity('kick', time)
-                pattern_hits['kick'].append((time, velocity))
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
             if random.random() < syncopation:
                 time = offset + 3.5
                 velocity = self._get_velocity('kick', time)
-                pattern_hits['kick'].append((time, velocity))
+                self._add_drum_hit(pattern_hits, 'kick', time, velocity)
 
     def _add_snare(self, pattern_hits, offset, style, variation, syncopation, bar_num):
         """Add snare hits - always on backbeat plus variations with humanized velocity"""
@@ -432,22 +452,22 @@ class DrumPatternGenerator:
         # Backbeat (beats 2 and 4) - this is sacred!
         time = offset + 1
         velocity = self._get_velocity('snare', time, is_accent=True)
-        pattern_hits['snare'].append((time, velocity))
+        self._add_drum_hit(pattern_hits, 'snare', time, velocity)
 
         time = offset + 3
         velocity = self._get_velocity('snare', time, is_accent=True)
-        pattern_hits['snare'].append((time, velocity))
+        self._add_drum_hit(pattern_hits, 'snare', time, velocity)
 
         if style == 'pop_punk':
             # More aggressive, add ghost notes occasionally
             if random.random() < variation * 0.4:
                 time = offset + 1.75
                 velocity = self._get_velocity('snare', time, is_ghost=True)
-                pattern_hits['snare'].append((time, velocity))
+                self._add_drum_hit(pattern_hits, 'snare', time, velocity)
             if random.random() < syncopation:
                 time = offset + 3.75
                 velocity = self._get_velocity('snare', time)
-                pattern_hits['snare'].append((time, velocity))
+                self._add_drum_hit(pattern_hits, 'snare', time, velocity)
 
         elif style == 'singer_songwriter':
             # Subtle, maybe some rim clicks
@@ -468,7 +488,7 @@ class DrumPatternGenerator:
                 # Sometimes full snare on 2 for accent
                 time = offset + 1
                 velocity = self._get_velocity('snare', time, is_accent=True)
-                pattern_hits['snare'].append((time, velocity))
+                self._add_drum_hit(pattern_hits, 'snare', time, velocity)
 
             if random.random() < 0.7:
                 # Beat 4 as rim click
@@ -479,13 +499,13 @@ class DrumPatternGenerator:
                 # Sometimes full snare on 4
                 time = offset + 3
                 velocity = self._get_velocity('snare', time, is_accent=True)
-                pattern_hits['snare'].append((time, velocity))
+                self._add_drum_hit(pattern_hits, 'snare', time, velocity)
 
             # Occasional ghost notes on snare
             if random.random() < variation * 0.3:
                 time = offset + 2.5
                 velocity = self._get_velocity('snare', time, is_ghost=True)
-                pattern_hits['snare'].append((time, velocity))
+                self._add_drum_hit(pattern_hits, 'snare', time, velocity)
 
     def _add_hihats(self, pattern_hits, offset, hihat_pattern, density, variation, bar_num):
         """Add hi-hat pattern with humanized velocity"""
@@ -602,7 +622,7 @@ class DrumPatternGenerator:
                 time = offset + (i / subdivisions) * 4
                 fill_progress = i / subdivisions
                 velocity = self._get_velocity('snare', time, fill_progress=fill_progress)
-                pattern_hits['snare'].append((time, velocity))
+                self._add_drum_hit(pattern_hits, 'snare', time, velocity)
             # Roll ends naturally, crash on beat 1 of next bar
 
         elif fill_type == 'paradiddle':
@@ -621,7 +641,7 @@ class DrumPatternGenerator:
             for i, time in enumerate(build_times):
                 fill_progress = i / len(build_times)
                 velocity = self._get_velocity('snare', time, fill_progress=fill_progress)
-                pattern_hits['snare'].append((time, velocity))
+                self._add_drum_hit(pattern_hits, 'snare', time, velocity)
             # Build ends, letting anticipation resolve on beat 1 of next bar
 
     def _calculate_complexity(self, density, variation, syncopation):
