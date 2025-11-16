@@ -84,6 +84,78 @@ const presets = {
         fill_frequency: 0.3,
         kick_pattern: 'd_beat',
         hihat_pattern: 'sixteenth'
+    },
+    'ballad': {
+        tempo: 72,
+        style: 'singer_songwriter',
+        section: 'verse',
+        bars: 8,
+        density: 0.4,
+        variation: 0.6,
+        syncopation: 0.1,
+        fill_frequency: 0.1,
+        kick_pattern: 'half_time',
+        hihat_pattern: 'ride'
+    },
+    'disco': {
+        tempo: 120,
+        style: 'pop_punk',
+        section: 'chorus',
+        bars: 8,
+        density: 0.85,
+        variation: 0.3,
+        syncopation: 0.2,
+        fill_frequency: 0.2,
+        kick_pattern: 'four_floor',
+        hihat_pattern: 'open_closed'
+    },
+    'funk': {
+        tempo: 105,
+        style: 'hybrid',
+        section: 'verse',
+        bars: 8,
+        density: 0.75,
+        variation: 0.7,
+        syncopation: 0.65,
+        fill_frequency: 0.25,
+        kick_pattern: 'punk',
+        hihat_pattern: 'sixteenth'
+    },
+    'rock-shuffle': {
+        tempo: 130,
+        style: 'pop_punk',
+        section: 'chorus',
+        bars: 8,
+        density: 0.8,
+        variation: 0.4,
+        syncopation: 0.3,
+        fill_frequency: 0.3,
+        kick_pattern: 'punk',
+        hihat_pattern: 'swing'
+    },
+    'blast-beat': {
+        tempo: 200,
+        style: 'pop_punk',
+        section: 'breakdown',
+        bars: 4,
+        density: 1.0,
+        variation: 0.3,
+        syncopation: 0.2,
+        fill_frequency: 0.15,
+        kick_pattern: 'double',
+        hihat_pattern: 'sixteenth'
+    },
+    'half-time': {
+        tempo: 75,
+        style: 'hybrid',
+        section: 'verse',
+        bars: 8,
+        density: 0.6,
+        variation: 0.5,
+        syncopation: 0.4,
+        fill_frequency: 0.2,
+        kick_pattern: 'half_time',
+        hihat_pattern: 'eighth'
     }
 };
 
