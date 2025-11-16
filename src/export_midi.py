@@ -198,6 +198,15 @@ def export_drum_pattern(data, output_path, ticks_per_beat=480):
 
         current_time = event['time']
 
+    # Add end_of_track marker padded to full bar length
+    # This ensures MIDI clips are the correct length for grid-based DAWs
+    remaining_beats = total_beats - current_time
+    if remaining_beats > 0:
+        remaining_ticks = beats_to_ticks(remaining_beats, ticks_per_beat)
+        track.append(MetaMessage('end_of_track', time=remaining_ticks))
+    else:
+        track.append(MetaMessage('end_of_track', time=0))
+
     mid.save(output_path)
     print(f"✓ Exported drum pattern: {output_path}")
 

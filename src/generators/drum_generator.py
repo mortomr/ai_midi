@@ -24,7 +24,7 @@ class DrumPatternGenerator:
         'hihat_open': 46,
         'hihat_pedal': 44,
         'ride': 51,
-        'crash': 49,
+        'crash': 57,  # Crash Cymbal 2 (A3) - more widely supported than 49
         'tom_high': 50,
         'tom_mid': 47,
         'tom_low': 45,
@@ -592,11 +592,8 @@ class DrumPatternGenerator:
                     pattern_hits[tom].append((time, velocity))
                     hit_count += 1
 
-            # End with crash and kick
-            velocity = self._get_velocity('crash', offset + 4, is_accent=True)
-            pattern_hits['crash'].append((offset + 4, velocity))
-            velocity = self._get_velocity('kick', offset + 4, is_accent=True)
-            pattern_hits['kick'].append((offset + 4, velocity))
+            # Final hit lands on last subdivision (not beyond the bar)
+            # Crash will naturally appear on beat 1 of next bar from main pattern
 
         elif fill_type == 'snare_roll':
             # Fast snare roll with crescendo
@@ -606,8 +603,7 @@ class DrumPatternGenerator:
                 fill_progress = i / subdivisions
                 velocity = self._get_velocity('snare', time, fill_progress=fill_progress)
                 pattern_hits['snare'].append((time, velocity))
-            velocity = self._get_velocity('crash', offset + 4, is_accent=True)
-            pattern_hits['crash'].append((offset + 4, velocity))
+            # Roll ends naturally, crash on beat 1 of next bar
 
         elif fill_type == 'paradiddle':
             # Paradiddle-inspired fill (RLRR LRLL) with velocity variation
@@ -617,8 +613,7 @@ class DrumPatternGenerator:
                 fill_progress = i / len(sticking)
                 velocity = self._get_velocity(drum, time, fill_progress=fill_progress)
                 pattern_hits[drum].append((time, velocity))
-            velocity = self._get_velocity('crash', offset + 4, is_accent=True)
-            pattern_hits['crash'].append((offset + 4, velocity))
+            # Paradiddle ends naturally, crash on beat 1 of next bar
 
         elif fill_type == 'crash_build':
             # Building crash with crescendo
@@ -627,10 +622,7 @@ class DrumPatternGenerator:
                 fill_progress = i / len(build_times)
                 velocity = self._get_velocity('snare', time, fill_progress=fill_progress)
                 pattern_hits['snare'].append((time, velocity))
-            velocity = self._get_velocity('crash', offset + 4, is_accent=True)
-            pattern_hits['crash'].append((offset + 4, velocity))
-            velocity = self._get_velocity('kick', offset + 4, is_accent=True)
-            pattern_hits['kick'].append((offset + 4, velocity))
+            # Build ends, letting anticipation resolve on beat 1 of next bar
 
     def _calculate_complexity(self, density, variation, syncopation):
         """Calculate complexity rating 1-5"""
