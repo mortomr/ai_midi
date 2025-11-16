@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🥁 AI MIDI Drum Generator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🥁 AI MIDI Drum Generator</h1>
+            <p class="subtitle">Create realistic, generative drum patterns with intelligent controls</p>
+        </header>
+
+        <main>
+            <div class="controls-grid">
+                <!-- Left Column: Basic Parameters -->
+                <div class="control-section">
+                    <h2>Basic Parameters</h2>
+
+                    <div class="control-group">
+                        <label for="tempo">
+                            Tempo: <span id="tempo-value">140</span> BPM
+                        </label>
+                        <input type="range" id="tempo" min="60" max="220" value="140" step="5">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="bars">
+                            Bars: <span id="bars-value">4</span>
+                        </label>
+                        <input type="range" id="bars" min="1" max="32" value="4" step="1">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="style">Style</label>
+                        <select id="style">
+                            <option value="pop_punk">Pop/Punk</option>
+                            <option value="singer_songwriter">Singer-Songwriter</option>
+                            <option value="reggae_ska">Reggae/Ska</option>
+                            <option value="hybrid">Hybrid</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="section">Song Section (optional)</label>
+                        <select id="section">
+                            <option value="none">-- None (Manual Control) --</option>
+                            <option value="intro">Intro - Building, sparse</option>
+                            <option value="verse">Verse - Supportive groove</option>
+                            <option value="pre_chorus">Pre-Chorus - Building tension</option>
+                            <option value="chorus">Chorus - Full energy!</option>
+                            <option value="bridge">Bridge - Contrasting</option>
+                            <option value="breakdown">Breakdown - Minimal</option>
+                            <option value="outro">Outro - Big finish</option>
+                        </select>
+                        <p class="help-text">Auto-adjusts intensity for song structure</p>
+                    </div>
+                </div>
+
+                <!-- Middle Column: Intensity Controls -->
+                <div class="control-section">
+                    <h2>Intensity Controls</h2>
+
+                    <div class="control-group">
+                        <label for="density">
+                            Density: <span id="density-value">0.70</span>
+                        </label>
+                        <input type="range" id="density" min="0" max="1" value="0.7" step="0.05">
+                        <p class="help-text">How busy the pattern is</p>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="variation">
+                            Variation: <span id="variation-value">0.50</span>
+                        </label>
+                        <input type="range" id="variation" min="0" max="1" value="0.5" step="0.05">
+                        <p class="help-text">How much it changes</p>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="syncopation">
+                            Syncopation: <span id="syncopation-value">0.30</span>
+                        </label>
+                        <input type="range" id="syncopation" min="0" max="1" value="0.3" step="0.05">
+                        <p class="help-text">Off-beat hits</p>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="fill_frequency">
+                            Fill Frequency: <span id="fill-value">0.25</span>
+                        </label>
+                        <input type="range" id="fill_frequency" min="0" max="1" value="0.25" step="0.05">
+                        <p class="help-text">How often fills occur</p>
+                    </div>
+                </div>
+
+                <!-- Right Column: Pattern Selection -->
+                <div class="control-section">
+                    <h2>Pattern Selection</h2>
+
+                    <div class="control-group">
+                        <label for="kick_pattern">Kick Pattern</label>
+                        <select id="kick_pattern">
+                            <option value="punk">Punk (1 & 3)</option>
+                            <option value="four_floor">Four-on-the-floor</option>
+                            <option value="half_time">Half-time</option>
+                            <option value="double">Double bass</option>
+                            <option value="skank">Skank (ska)</option>
+                            <option value="one_drop">One-drop (reggae)</option>
+                            <option value="d_beat">D-beat (hardcore)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="hihat_pattern">Hi-hat Pattern</label>
+                        <select id="hihat_pattern">
+                            <option value="eighth">Eighth notes</option>
+                            <option value="sixteenth">Sixteenth notes (fast)</option>
+                            <option value="ride">Ride cymbal</option>
+                            <option value="open_closed">Open/Closed alternating</option>
+                            <option value="skank">Skank (offbeats only)</option>
+                            <option value="swing">Swing (triplet feel)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group presets-section">
+                        <h3>Quick Presets</h3>
+                        <button class="preset-btn" data-preset="fast-punk">Fast Punk</button>
+                        <button class="preset-btn" data-preset="mellow">Mellow Singer-Songwriter</button>
+                        <button class="preset-btn" data-preset="ska">Ska Skank</button>
+                        <button class="preset-btn" data-preset="reggae">Reggae One-Drop</button>
+                        <button class="preset-btn" data-preset="hardcore">Hardcore D-Beat</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <div class="generate-section">
+                <button id="generate-btn" class="generate-btn">
+                    🎵 Generate Drum Pattern
+                </button>
+                <div id="status" class="status"></div>
+                <div id="download-section" class="download-section" style="display: none;">
+                    <p id="pattern-description"></p>
+                    <a id="download-link" class="download-btn" download>
+                        ⬇️ Download MIDI File
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>AI MIDI Generator - Generative drum patterns with music theory intelligence</p>
+            <p class="features">✨ Humanized velocity • Song section awareness • Infinite variations</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

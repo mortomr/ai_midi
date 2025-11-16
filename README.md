@@ -203,19 +203,51 @@ The drum generator includes sophisticated velocity humanization for realistic, h
 
 ### Requirements
 - Python 3.x
-- mido library
+- mido library (MIDI handling)
+- flask library (web interface)
 
 ### Setup
 
 ```bash
-# Install mido
-pip install mido
-
 # Clone or download this repository
 cd ai_midi
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Or install manually:
+pip install mido flask
 ```
 
 ## Usage
+
+### Web Interface (RECOMMENDED!)
+
+The easiest way to generate drum patterns is through the web interface:
+
+**Windows:**
+```batch
+start_web.bat
+```
+
+**Mac/Linux:**
+```bash
+./start_web.sh
+```
+
+Then open your browser to: **http://localhost:5000**
+
+**Features:**
+- 🎚️ **Visual sliders** for all parameters (tempo, density, variation, etc.)
+- 🎵 **Instant generation** - click, download, done
+- 🎯 **Quick presets** - Fast Punk, Mellow Singer-Songwriter, Ska Skank, etc.
+- 📊 **Song sections** - Auto-adjust intensity for intro, verse, chorus, bridge, etc.
+- 💾 **One-click download** - Get your MIDI file instantly
+- 📱 **Works everywhere** - Desktop, tablet, mobile
+
+### Command Line Interface
+
+If you prefer the command line, you can use `generate_drums.py` directly (see examples in the Generative Drum Engine section below).
 
 ### Export All Patterns to MIDI
 
