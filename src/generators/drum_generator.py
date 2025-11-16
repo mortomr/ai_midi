@@ -614,15 +614,17 @@ class DrumPatternGenerator:
 
         # Select fill type based on rudiment_type parameter
         if rudiment_type == 'rolls':
-            fill_choices = ['snare_roll', 'tom_descent']
+            fill_choices = ['snare_roll', 'tom_descent', 'double_stroke_roll', 'buzz_roll']
         elif rudiment_type == 'diddles':
-            fill_choices = ['paradiddle']
+            fill_choices = ['paradiddle', 'double_paradiddle', 'linear_fill']
         elif rudiment_type == 'flams':
-            fill_choices = ['crash_build', 'paradiddle']
+            fill_choices = ['flam_tap', 'crash_build', 'flamacue']
         elif rudiment_type == 'drags':
-            fill_choices = ['snare_roll', 'crash_build']
+            fill_choices = ['drag_fill', 'ruff_fill', 'snare_roll']
         else:  # mixed
-            fill_choices = ['tom_descent', 'snare_roll', 'paradiddle', 'crash_build']
+            fill_choices = ['tom_descent', 'snare_roll', 'paradiddle', 'crash_build',
+                          'tom_ascent', 'triplet_fill', 'linear_fill', 'double_stroke_roll',
+                          'flam_tap', 'alternating_toms']
 
         fill_type = random.choice(fill_choices)
 
@@ -704,6 +706,235 @@ class DrumPatternGenerator:
                 scaled_progress = fill_progress * intensity_factor
                 velocity = self._get_velocity('snare', time, fill_progress=scaled_progress)
                 self._add_drum_hit(pattern_hits, 'snare', time, velocity)
+
+        elif fill_type == 'tom_ascent':
+            # Ascending tom fill (opposite of descent)
+            toms = ['tom_floor', 'tom_low', 'tom_mid', 'tom_high']
+            base_subdivisions = 8 if density > 0.6 else 4
+            subdivisions = int(base_subdivisions * intensity_factor)
+            subdivisions = max(4, subdivisions)
+            time_increment = 4.0 / subdivisions
+            total_hits = subdivisions
+
+            hit_count = 0
+            for i, tom in enumerate(toms):
+                for j in range(subdivisions // len(toms)):
+                    time = offset + (i * subdivisions // len(toms) + j) * time_increment
+                    fill_progress = hit_count / total_hits
+                    scaled_progress = fill_progress * intensity_factor
+                    velocity = self._get_velocity(tom, time, fill_progress=scaled_progress)
+                    pattern_hits[tom].append((time, velocity))
+                    hit_count += 1
+
+        elif fill_type == 'triplet_fill':
+            # Triplet-based fill across toms and snare
+            triplets_per_beat = 3
+            num_beats = 4
+            total_triplets = triplets_per_beat * num_beats
+            # Scale by intensity
+            num_triplets = int(total_triplets * intensity_factor)
+            num_triplets = max(6, num_triplets)
+
+            drums = ['snare', 'tom_high', 'tom_mid', 'tom_low', 'tom_floor']
+            for i in range(num_triplets):
+                time = offset + (i / 3.0) * (4.0 / (num_triplets / 3.0))
+                fill_progress = i / num_triplets
+                scaled_progress = fill_progress * intensity_factor
+                drum = drums[i % len(drums)]
+                velocity = self._get_velocity(drum, time, fill_progress=scaled_progress)
+                pattern_hits[drum].append((time, velocity))
+
+        elif fill_type == 'linear_fill':
+            # Linear fill - no simultaneous hits, alternating between drums
+            base_subdivisions = 16 if density > 0.7 else 8
+            subdivisions = int(base_subdivisions * intensity_factor)
+            subdivisions = max(8, subdivisions)
+
+            drums = ['snare', 'tom_high', 'hihat_closed', 'tom_mid', 'kick', 'tom_low']
+            for i in range(subdivisions):
+                time = offset + (i / subdivisions) * 4
+                fill_progress = i / subdivisions
+                scaled_progress = fill_progress * intensity_factor
+                drum = drums[i % len(drums)]
+                is_accent = (i % 4 == 0) and rudiment_intensity > 0.5
+                velocity = self._get_velocity(drum, time, fill_progress=scaled_progress, is_accent=is_accent)
+
+                if drum == 'kick':
+                    self._add_drum_hit(pattern_hits, 'kick', time, velocity)
+                else:
+                    pattern_hits[drum].append((time, velocity))
+
+        elif fill_type == 'double_stroke_roll':
+            # Double stroke roll (RRLL pattern) across snare and toms
+            base_subdivisions = 16 if density > 0.7 else 8
+            subdivisions = int(base_subdivisions * intensity_factor)
+            subdivisions = max(8, subdivisions)
+
+            # RRLL pattern across different drums
+            pattern = ['snare', 'snare', 'tom_high', 'tom_high',
+                      'tom_mid', 'tom_mid', 'tom_low', 'tom_low']
+
+            for i in range(subdivisions):
+                time = offset + (i / subdivisions) * 4
+                fill_progress = i / subdivisions
+                scaled_progress = fill_progress * intensity_factor
+                drum = pattern[i % len(pattern)]
+                is_accent = (i % 2 == 0) and rudiment_intensity > 0.6
+                velocity = self._get_velocity(drum, time, fill_progress=scaled_progress, is_accent=is_accent)
+                pattern_hits[drum].append((time, velocity))
+
+        elif fill_type == 'flam_tap':
+            # Flam tap pattern - grace note before main note
+            base_hits = 8 if density > 0.6 else 4
+            num_hits = int(base_hits * intensity_factor)
+            num_hits = max(4, num_hits)
+
+            drums = ['snare', 'tom_high', 'tom_mid', 'tom_low']
+            for i in range(num_hits):
+                time = offset + (i / num_hits) * 4
+                fill_progress = i / num_hits
+                scaled_progress = fill_progress * intensity_factor
+                drum = drums[i % len(drums)]
+
+                # Grace note (flam) - only if time is positive
+                if rudiment_intensity > 0.4 and time > 0.05:
+                    grace_time = time - 0.05
+                    grace_vel = self._get_velocity(drum, grace_time, is_ghost=True)
+                    pattern_hits[drum].append((grace_time, grace_vel))
+
+                # Main note
+                velocity = self._get_velocity(drum, time, fill_progress=scaled_progress, is_accent=True)
+                pattern_hits[drum].append((time, velocity))
+
+        elif fill_type == 'drag_fill':
+            # Drag rudiment - double grace notes before main note
+            base_hits = 6 if density > 0.6 else 4
+            num_hits = int(base_hits * intensity_factor)
+            num_hits = max(4, num_hits)
+
+            drums = ['snare', 'tom_high', 'tom_mid', 'tom_low']
+            for i in range(num_hits):
+                time = offset + (i / num_hits) * 4
+                fill_progress = i / num_hits
+                scaled_progress = fill_progress * intensity_factor
+                drum = drums[i % len(drums)]
+
+                # Two grace notes (drag) - only if time is positive
+                if rudiment_intensity > 0.3 and time > 0.1:
+                    grace1_time = time - 0.08
+                    grace2_time = time - 0.04
+                    grace_vel = self._get_velocity(drum, grace1_time, is_ghost=True)
+                    pattern_hits[drum].append((grace1_time, grace_vel))
+                    pattern_hits[drum].append((grace2_time, grace_vel))
+
+                # Main note
+                velocity = self._get_velocity(drum, time, fill_progress=scaled_progress, is_accent=True)
+                pattern_hits[drum].append((time, velocity))
+
+        elif fill_type == 'ruff_fill':
+            # Four-stroke ruff pattern
+            base_hits = 6
+            num_hits = int(base_hits * intensity_factor)
+            num_hits = max(4, num_hits)
+
+            for i in range(num_hits):
+                time = offset + (i / num_hits) * 4
+                fill_progress = i / num_hits
+                scaled_progress = fill_progress * intensity_factor
+
+                # Three grace notes - only if time is positive
+                if rudiment_intensity > 0.4 and time > 0.1:
+                    for j in range(3):
+                        grace_time = time - (0.03 * (3 - j))
+                        grace_vel = self._get_velocity('snare', grace_time, is_ghost=True)
+                        self._add_drum_hit(pattern_hits, 'snare', grace_time, grace_vel)
+
+                # Main note
+                velocity = self._get_velocity('snare', time, fill_progress=scaled_progress, is_accent=True)
+                self._add_drum_hit(pattern_hits, 'snare', time, velocity)
+
+        elif fill_type == 'buzz_roll':
+            # Buzz/press roll - rapid multiple bounce rolls
+            base_subdivisions = 12 if density > 0.6 else 8
+            subdivisions = int(base_subdivisions * intensity_factor)
+            subdivisions = max(6, subdivisions)
+
+            for i in range(subdivisions):
+                time = offset + (i / subdivisions) * 4
+                fill_progress = i / subdivisions
+                scaled_progress = fill_progress * intensity_factor
+                velocity = self._get_velocity('snare', time, fill_progress=scaled_progress)
+                self._add_drum_hit(pattern_hits, 'snare', time, velocity)
+
+                # Add buzz effect with ghost notes between main hits
+                if rudiment_intensity > 0.5 and i < subdivisions - 1:
+                    buzz_time = time + (0.5 / subdivisions)
+                    buzz_vel = self._get_velocity('snare', buzz_time, is_ghost=True)
+                    self._add_drum_hit(pattern_hits, 'snare', buzz_time, buzz_vel)
+
+        elif fill_type == 'double_paradiddle':
+            # Double paradiddle (RLRLRR LRLRLL)
+            sticking = ['snare', 'tom_high', 'snare', 'tom_mid', 'snare', 'snare',
+                       'tom_high', 'snare', 'tom_mid', 'snare', 'tom_low', 'tom_low']
+            time_divisor = 0.4 * (1.0 / intensity_factor)
+
+            for i, drum in enumerate(sticking):
+                time = offset + i * time_divisor
+                if time >= offset + 4:  # Don't go past the bar
+                    break
+                fill_progress = i / len(sticking)
+                scaled_progress = fill_progress * intensity_factor
+                is_accent = (i % 6 == 0) and rudiment_intensity > 0.5
+                velocity = self._get_velocity(drum, time, fill_progress=scaled_progress, is_accent=is_accent)
+                pattern_hits[drum].append((time, velocity))
+
+        elif fill_type == 'flamacue':
+            # Flamacue rudiment pattern
+            base_hits = 6
+            num_hits = int(base_hits * intensity_factor)
+            num_hits = max(4, num_hits)
+
+            drums = ['snare', 'tom_high', 'tom_mid', 'tom_low']
+            for i in range(num_hits):
+                time = offset + (i / num_hits) * 4
+                fill_progress = i / num_hits
+                scaled_progress = fill_progress * intensity_factor
+                drum = drums[i % len(drums)]
+
+                # Flam on first note of group - only if time is positive
+                if rudiment_intensity > 0.4 and time > 0.05:
+                    grace_time = time - 0.05
+                    grace_vel = self._get_velocity(drum, grace_time, is_ghost=True)
+                    pattern_hits[drum].append((grace_time, grace_vel))
+
+                # Main note with accent
+                velocity = self._get_velocity(drum, time, fill_progress=scaled_progress, is_accent=True)
+                pattern_hits[drum].append((time, velocity))
+
+                # Two quick taps after
+                if i < num_hits - 1:
+                    tap1_time = time + (0.25 / num_hits) * 4
+                    tap2_time = time + (0.5 / num_hits) * 4
+                    tap_vel = self._get_velocity(drum, tap1_time)
+                    pattern_hits[drum].append((tap1_time, tap_vel))
+                    pattern_hits[drum].append((tap2_time, tap_vel))
+
+        elif fill_type == 'alternating_toms':
+            # Alternating tom pattern with varied rhythms
+            base_subdivisions = 8 if density > 0.6 else 4
+            subdivisions = int(base_subdivisions * intensity_factor)
+            subdivisions = max(4, subdivisions)
+
+            # Alternate between high/low, mid/floor
+            toms = ['tom_high', 'tom_low', 'tom_mid', 'tom_floor']
+            for i in range(subdivisions):
+                time = offset + (i / subdivisions) * 4
+                fill_progress = i / subdivisions
+                scaled_progress = fill_progress * intensity_factor
+                tom = toms[i % len(toms)]
+                is_accent = (i % 2 == 0)
+                velocity = self._get_velocity(tom, time, fill_progress=scaled_progress, is_accent=is_accent)
+                pattern_hits[tom].append((time, velocity))
 
     def _calculate_complexity(self, density, variation, syncopation):
         """Calculate complexity rating 1-5"""
