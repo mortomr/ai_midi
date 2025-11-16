@@ -7,7 +7,8 @@ const sliders = [
     { id: 'density', display: 'density-value', unit: '', decimals: 2 },
     { id: 'variation', display: 'variation-value', unit: '', decimals: 2 },
     { id: 'syncopation', display: 'syncopation-value', unit: '', decimals: 2 },
-    { id: 'fill_frequency', display: 'fill-value', unit: '', decimals: 2 }
+    { id: 'fill_frequency', display: 'fill-value', unit: '', decimals: 2 },
+    { id: 'rudiment_intensity', display: 'rudiment-intensity-value', unit: '', decimals: 2 }
 ];
 
 sliders.forEach(slider => {
@@ -201,7 +202,9 @@ generateBtn.addEventListener('click', async () => {
         fill_frequency: document.getElementById('fill_frequency').value,
         kick_pattern: document.getElementById('kick_pattern').value,
         hihat_pattern: document.getElementById('hihat_pattern').value,
-        fills_only: document.getElementById('fills_only').checked
+        fills_only: document.getElementById('fills_only').checked,
+        rudiment_type: document.getElementById('rudiment_type').value,
+        rudiment_intensity: parseFloat(document.getElementById('rudiment_intensity').value)
     };
 
     // Add seed if provided (optional)

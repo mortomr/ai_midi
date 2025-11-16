@@ -48,6 +48,8 @@ def generate_pattern():
         hihat_pattern = data.get('hihat_pattern', 'eighth')
         seed = data.get('seed')  # Optional - None if not provided
         fills_only = data.get('fills_only', False)  # Optional - default False
+        rudiment_type = data.get('rudiment_type', 'mixed')  # Optional - default mixed
+        rudiment_intensity = float(data.get('rudiment_intensity', 0.5))  # Optional - default 0.5
 
         # Generate pattern
         generator = DrumPatternGenerator(tempo=tempo, seed=seed)
@@ -61,7 +63,9 @@ def generate_pattern():
             kick_pattern=kick_pattern,
             hihat_pattern=hihat_pattern,
             section=section,
-            fills_only=fills_only
+            fills_only=fills_only,
+            rudiment_type=rudiment_type,
+            rudiment_intensity=rudiment_intensity
         )
 
         # Create filename with timestamp

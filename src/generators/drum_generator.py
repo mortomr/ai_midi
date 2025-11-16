@@ -191,7 +191,9 @@ class DrumPatternGenerator:
                         kick_pattern='punk',
                         hihat_pattern='eighth',
                         section=None,
-                        fills_only=False):
+                        fills_only=False,
+                        rudiment_type='mixed',
+                        rudiment_intensity=0.5):
         """
         Generate a complete drum pattern
 
@@ -206,6 +208,8 @@ class DrumPatternGenerator:
             hihat_pattern: 'eighth', 'sixteenth', 'ride', 'open_closed', 'skank', 'swing'
             section: Song section (optional): 'intro', 'verse', 'pre_chorus', 'chorus', 'bridge', 'breakdown', 'outro'
             fills_only: Generate only fills, no groove (default: False)
+            rudiment_type: 'mixed', 'rolls', 'diddles', 'flams', 'drags' (controls fill flavor)
+            rudiment_intensity: 0.0-1.0, how prominently rudiments feature (controls ghost notes, accents)
 
         Returns:
             Dictionary with pattern data ready for MIDI export
@@ -230,14 +234,14 @@ class DrumPatternGenerator:
 
             if fills_only:
                 # Fills-only mode: generate fill for every bar
-                self._add_fill(pattern_hits, bar_offset, style, density, bar_num, bars)
+                self._add_fill(pattern_hits, bar_offset, style, density, bar_num, bars, rudiment_type, rudiment_intensity)
             else:
                 # Normal mode: groove with occasional fills
                 is_fill_bar = random.random() < fill_frequency
 
                 if is_fill_bar and bar_num == bars - 1:
                     # Last bar fill
-                    self._add_fill(pattern_hits, bar_offset, style, density, bar_num, bars)
+                    self._add_fill(pattern_hits, bar_offset, style, density, bar_num, bars, rudiment_type, rudiment_intensity)
                 else:
                     # Regular groove
                     self._add_kick(pattern_hits, bar_offset, kick_pattern, variation, syncopation, bar_num)
@@ -599,15 +603,40 @@ class DrumPatternGenerator:
                         velocity = self._get_velocity('hihat_closed', time)
                         pattern_hits['hihat_closed'].append((time, velocity))
 
-    def _add_fill(self, pattern_hits, offset, style, density, bar_num, total_bars):
-        """Add a drum fill using rudiments-inspired patterns with crescendo"""
+    def _add_fill(self, pattern_hits, offset, style, density, bar_num, total_bars, rudiment_type='mixed', rudiment_intensity=0.5):
+        """
+        Add a drum fill using rudiments-inspired patterns with crescendo
 
-        fill_type = random.choice(['tom_descent', 'snare_roll', 'paradiddle', 'crash_build'])
+        Args:
+            rudiment_type: 'mixed', 'rolls', 'diddles', 'flams', 'drags' (controls fill flavor)
+            rudiment_intensity: 0.0-1.0, how prominently rudiments feature (controls ghost notes, accents)
+        """
+
+        # Select fill type based on rudiment_type parameter
+        if rudiment_type == 'rolls':
+            fill_choices = ['snare_roll', 'tom_descent']
+        elif rudiment_type == 'diddles':
+            fill_choices = ['paradiddle']
+        elif rudiment_type == 'flams':
+            fill_choices = ['crash_build', 'paradiddle']
+        elif rudiment_type == 'drags':
+            fill_choices = ['snare_roll', 'crash_build']
+        else:  # mixed
+            fill_choices = ['tom_descent', 'snare_roll', 'paradiddle', 'crash_build']
+
+        fill_type = random.choice(fill_choices)
+
+        # Use rudiment_intensity to control subdivision density and accent strength
+        # Higher intensity = more subdivisions, stronger accents
+        intensity_factor = 0.5 + (rudiment_intensity * 0.5)  # Range: 0.5 to 1.0
 
         if fill_type == 'tom_descent':
             # Descending tom fill with crescendo
             toms = ['tom_high', 'tom_mid', 'tom_low', 'tom_floor']
-            subdivisions = 8 if density > 0.6 else 4
+            # Intensity affects subdivision density
+            base_subdivisions = 8 if density > 0.6 else 4
+            subdivisions = int(base_subdivisions * intensity_factor)
+            subdivisions = max(4, subdivisions)  # At least 4 hits
             time_increment = 4.0 / subdivisions
             total_hits = subdivisions
 
@@ -616,41 +645,65 @@ class DrumPatternGenerator:
                 for j in range(subdivisions // len(toms)):
                     time = offset + (i * subdivisions // len(toms) + j) * time_increment
                     fill_progress = hit_count / total_hits
-                    velocity = self._get_velocity(tom, time, fill_progress=fill_progress)
+                    # Scale fill_progress by intensity for stronger crescendo
+                    scaled_progress = fill_progress * intensity_factor
+                    velocity = self._get_velocity(tom, time, fill_progress=scaled_progress)
                     pattern_hits[tom].append((time, velocity))
                     hit_count += 1
 
-            # Final hit lands on last subdivision (not beyond the bar)
-            # Crash will naturally appear on beat 1 of next bar from main pattern
+            # Add ghost notes between hits based on intensity
+            if rudiment_intensity > 0.6:
+                for i in range(subdivisions - 1):
+                    if random.random() < (rudiment_intensity - 0.6) * 2:
+                        time = offset + (i + 0.5) * time_increment
+                        velocity = self._get_velocity('snare', time, is_ghost=True)
+                        self._add_drum_hit(pattern_hits, 'snare', time, velocity)
 
         elif fill_type == 'snare_roll':
             # Fast snare roll with crescendo
-            subdivisions = 16 if density > 0.7 else 8
+            base_subdivisions = 16 if density > 0.7 else 8
+            subdivisions = int(base_subdivisions * intensity_factor)
+            subdivisions = max(8, subdivisions)  # At least 8 hits
             for i in range(subdivisions):
                 time = offset + (i / subdivisions) * 4
                 fill_progress = i / subdivisions
-                velocity = self._get_velocity('snare', time, fill_progress=fill_progress)
+                # Scale fill_progress by intensity
+                scaled_progress = fill_progress * intensity_factor
+                velocity = self._get_velocity('snare', time, fill_progress=scaled_progress)
                 self._add_drum_hit(pattern_hits, 'snare', time, velocity)
-            # Roll ends naturally, crash on beat 1 of next bar
+
+            # Add grace notes/drags based on intensity
+            if rudiment_intensity > 0.5:
+                grace_count = int((rudiment_intensity - 0.5) * 8)
+                for _ in range(grace_count):
+                    grace_time = offset + random.uniform(0.5, 3.5)
+                    velocity = self._get_velocity('snare', grace_time, is_ghost=True)
+                    self._add_drum_hit(pattern_hits, 'snare', grace_time, velocity)
 
         elif fill_type == 'paradiddle':
             # Paradiddle-inspired fill (RLRR LRLL) with velocity variation
             sticking = ['snare', 'tom_high', 'snare', 'snare', 'tom_mid', 'snare', 'tom_low', 'tom_low']
+            # Intensity affects timing density
+            time_divisor = 0.5 * (1.0 / intensity_factor)
             for i, drum in enumerate(sticking):
-                time = offset + i * 0.5
+                time = offset + i * time_divisor
                 fill_progress = i / len(sticking)
-                velocity = self._get_velocity(drum, time, fill_progress=fill_progress)
+                scaled_progress = fill_progress * intensity_factor
+                # Alternate between accents based on sticking pattern
+                is_accent = (i % 2 == 0) and rudiment_intensity > 0.5
+                velocity = self._get_velocity(drum, time, fill_progress=scaled_progress, is_accent=is_accent)
                 pattern_hits[drum].append((time, velocity))
-            # Paradiddle ends naturally, crash on beat 1 of next bar
 
         elif fill_type == 'crash_build':
             # Building crash with crescendo
-            build_times = [offset + 2, offset + 2.5, offset + 3, offset + 3.5]
+            # More build hits with higher intensity
+            num_hits = 4 + int(rudiment_intensity * 4)
+            build_times = [offset + 2 + (i * 1.5 / num_hits) for i in range(num_hits)]
             for i, time in enumerate(build_times):
                 fill_progress = i / len(build_times)
-                velocity = self._get_velocity('snare', time, fill_progress=fill_progress)
+                scaled_progress = fill_progress * intensity_factor
+                velocity = self._get_velocity('snare', time, fill_progress=scaled_progress)
                 self._add_drum_hit(pattern_hits, 'snare', time, velocity)
-            # Build ends, letting anticipation resolve on beat 1 of next bar
 
     def _calculate_complexity(self, density, variation, syncopation):
         """Calculate complexity rating 1-5"""

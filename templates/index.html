@@ -113,6 +113,26 @@
                         </label>
                         <p class="help-text">Generate only fills, no groove (great for 1-bar fill library)</p>
                     </div>
+
+                    <div class="control-group">
+                        <label for="rudiment_type">Rudiment Flavor</label>
+                        <select id="rudiment_type">
+                            <option value="mixed">Mixed (all types)</option>
+                            <option value="rolls">Rolls (snare rolls, tom fills)</option>
+                            <option value="diddles">Diddles (paradiddles)</option>
+                            <option value="flams">Flams (accented builds)</option>
+                            <option value="drags">Drags (grace note fills)</option>
+                        </select>
+                        <p class="help-text">Controls the type of fills generated</p>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="rudiment_intensity">
+                            Rudiment Intensity: <span id="rudiment-intensity-value">0.50</span>
+                        </label>
+                        <input type="range" id="rudiment_intensity" min="0" max="1" value="0.5" step="0.05">
+                        <p class="help-text">How prominent rudiments feature (ghost notes, accents, density)</p>
+                    </div>
                 </div>
 
                 <!-- Right Column: Pattern Selection -->

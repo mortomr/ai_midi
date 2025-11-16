@@ -84,6 +84,13 @@ Parameters Explained:
     parser.add_argument('--fills-only', action='store_true',
                        help='Generate only fills, no groove (perfect for 1-bar fill library)')
 
+    # Rudiment controls
+    parser.add_argument('--rudiment-type', choices=['mixed', 'rolls', 'diddles', 'flams', 'drags'],
+                       default='mixed',
+                       help='Rudiment flavor for fills (default: mixed)')
+    parser.add_argument('--rudiment-intensity', type=float, default=0.5,
+                       help='Rudiment intensity - ghost notes, accents, density (0.0-1.0, default: 0.5)')
+
     # Output options
     parser.add_argument('--output', '-o', type=str,
                        help='Output filename (default: auto-generated)')
@@ -103,6 +110,8 @@ Parameters Explained:
         parser.error('syncopation must be between 0.0 and 1.0')
     if not 0.0 <= args.fill_frequency <= 1.0:
         parser.error('fill_frequency must be between 0.0 and 1.0')
+    if not 0.0 <= args.rudiment_intensity <= 1.0:
+        parser.error('rudiment_intensity must be between 0.0 and 1.0')
 
     # Create output directory
     output_dir = Path('generated/generated_drums')
@@ -118,7 +127,11 @@ Parameters Explained:
     print(f"Bars: {args.bars}")
     print(f"Kick: {args.kick}, Hi-hat: {args.hihat}")
     print(f"Density: {args.density:.2f}, Variation: {args.variation:.2f}, Syncopation: {args.syncopation:.2f}")
-    print(f"Fill frequency: {args.fill_frequency:.2f}\n")
+    print(f"Fill frequency: {args.fill_frequency:.2f}")
+    print(f"Rudiment type: {args.rudiment_type}, Intensity: {args.rudiment_intensity:.2f}")
+    if args.fills_only:
+        print("Mode: Fills-only")
+    print()
 
     # Generate patterns
     for i in range(args.count):
@@ -137,7 +150,9 @@ Parameters Explained:
             kick_pattern=args.kick,
             hihat_pattern=args.hihat,
             section=args.section,
-            fills_only=args.fills_only
+            fills_only=args.fills_only,
+            rudiment_type=args.rudiment_type,
+            rudiment_intensity=args.rudiment_intensity
         )
 
         # Generate filename
